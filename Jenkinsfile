@@ -46,12 +46,12 @@ pipeline {
     }
 
     post {
-       /* success {
+       success {
             echo 'Build réussi.'
             mail to: "${NOTIFY_EMAIL}",
                  subject: "Build réussi : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Le build s'est terminé avec succès.\n\nDétails : ${env.BUILD_URL}"
-        }*/
+        }
 
         failure {
             echo 'Build échoué.'
