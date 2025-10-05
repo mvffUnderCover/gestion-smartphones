@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_COMPOSE_PATH = "C:\\Users\\bachir\\Documents\\repo-git\\express_mongo\\docker-compose.yml"
+        NOTIFY_EMAIL = "cmakhtar497@gmail.com"
     }
 
     stages {
@@ -35,15 +36,21 @@ pipeline {
                 bat "docker-compose -f ${DOCKER_COMPOSE_PATH} up -d"
             }
         }
-
     }
 
     post {
         success {
-            echo 'Build and deployment successful!'
+            echo '✅ Build réussi.'
+            mail to: "${NOTIFY_EMAIL}",
+                 subject: "✅ Build réussi : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Le build s'est terminé avec succès.\n\nDétails : ${env.BUILD_URL}"
         }
+
         failure {
-            echo 'Build failed.'
+            echo '❌ Build échoué.'
+            mail to: "${NOTIFY_EMAIL}",
+                 subject: "❌ Build échoué : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Le build a échoué.\n\nConsultez les logs ici : ${env.BUILD_URL}"
         }
     }
 }
