@@ -36,20 +36,27 @@ pipeline {
                 bat "docker-compose -f ${DOCKER_COMPOSE_PATH} up -d"
             }
         }
+        stage('Send Notification') {
+            steps {
+                 mail to: "${NOTIFY_EMAIL}",
+                     subject: "Jenkins Build Notification",
+                     body: "The Jenkins build and deployment process has completed successfully."
+            }
+         }
     }
 
     post {
-        success {
-            echo '✅ Build réussi.'
+       /* success {
+            echo 'Build réussi.'
             mail to: "${NOTIFY_EMAIL}",
-                 subject: "✅ Build réussi : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 subject: "Build réussi : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Le build s'est terminé avec succès.\n\nDétails : ${env.BUILD_URL}"
-        }
+        }*/
 
         failure {
-            echo '❌ Build échoué.'
+            echo 'Build échoué.'
             mail to: "${NOTIFY_EMAIL}",
-                 subject: "❌ Build échoué : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 subject: "Build échoué : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Le build a échoué.\n\nConsultez les logs ici : ${env.BUILD_URL}"
         }
     }
