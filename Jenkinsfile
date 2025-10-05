@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_COMPOSE_PATH = "C:\Users\bachir\Documents\repo-git\express_mongo\docker-compose.yml"
+        DOCKER_COMPOSE_PATH = "C:\\Users\\bachir\\Documents\\repo-git\\express_mongo\\docker-compose.yml"
     }
 
     stages {
