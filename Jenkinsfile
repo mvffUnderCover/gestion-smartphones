@@ -36,7 +36,14 @@ pipeline {
                 bat "docker-compose -f ${DOCKER_COMPOSE_PATH} up -d"
             }
         }
-
+       
+       stage('Send Notification') {
+            steps {
+                 mail to: "${NOTIFY_EMAIL}",
+                     subject: "Jenkins Build Notification",
+                     body: "The Jenkins build and deployment process has completed successfully."
+            }
+         }
     }
 
     post {
