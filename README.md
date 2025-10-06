@@ -6,6 +6,7 @@ L’orchestration des services se fait via **Docker Compose**.
 
 Test de webhook
 Le deuxiéme test aprés correction d'une petite erreur
+Jenkins, un outil de CI/CD
 
 
 ---

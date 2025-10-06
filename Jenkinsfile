@@ -41,18 +41,18 @@ pipeline {
             steps {
                 script {
                     def result = currentBuild.currentResult
-                    def statusIcon = result == 'SUCCESS' ? '✅' : '❌'
+                    def statusIcon = result == 'SUCCESS' ? 'Impeccable' : 'Probléme'
                     def subject = "${statusIcon} Build ${result} : ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-                    def body = """Bonjour Bachir 👋,
+                    def body = """Bonjour Bachir,
 
                     Le build du job **${env.JOB_NAME} #${env.BUILD_NUMBER}** s’est terminé avec le statut : ${result}.
 
-                    ➡️ Détails du build : ${env.BUILD_URL}
+                    Détails du build : ${env.BUILD_URL}
 
                     -- Jenkins
                     """
 
-                    echo "📧 Envoi d’un e-mail (${result})..."
+                    echo "Envoi d’un e-mail (${result})..."
                     mail to: "${NOTIFY_EMAIL}", subject: subject, body: body
                 }
             }
@@ -61,7 +61,7 @@ pipeline {
 
     post {
         always {
-            echo '✅ Pipeline terminé.'
+            echo 'Pipeline terminé.'
         }
     }
 }
