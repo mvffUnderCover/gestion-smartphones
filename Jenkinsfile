@@ -80,7 +80,7 @@ pipeline {
                     '''
                 }
             }
-
+        }
         stage('Send Notification') {
             steps {
                 script {
@@ -108,5 +108,4 @@ pipeline {
             echo 'Pipeline terminé.'
         }
     }
-}
 }
