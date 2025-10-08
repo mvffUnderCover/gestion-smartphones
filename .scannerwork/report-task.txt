@@ -1,0 +1,6 @@
+projectKey=Gestion-de-smartphone
+serverUrl=http://localhost:9000
+serverVersion=25.10.0.114319
+dashboardUrl=http://localhost:9000/dashboard?id=Gestion-de-smartphone
+ceTaskId=fe10c4e4-6c52-4f49-970e-8ce157e363fd
+ceTaskUrl=http://localhost:9000/api/ce/task?id=fe10c4e4-6c52-4f49-970e-8ce157e363fd

@@ -29,6 +29,29 @@ pipeline {
                 }
             }
         }
+        
+        // 🚀 Nouveau stage : Push Docker Images vers Docker Hub
+        stage('Push Docker Images') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat '''
+                            echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                            
+                            echo "Tagging images avant push..."
+                            docker tag express_mongo-backend:latest:latest %DOCKER_USER%/gestion-smartphones-backend:latest
+                            docker tag express_mongo-frontend:latest:latest %DOCKER_USER%/gestion-smartphones-frontend:latest
+
+                            echo "Pushing images vers Docker Hub..."
+                            docker push %DOCKER_USER%/gestion-smartphones-backend:latest
+                            docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
+
+                            echo "Push terminé avec succès !"
+                        '''
+                    }
+                }
+            }
+        }
 
         stage('Docker Build & Up') {
             steps {
