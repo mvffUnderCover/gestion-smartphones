@@ -39,8 +39,8 @@ pipeline {
                             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
                             
                             echo "Tagging images avant push..."
-                            docker tag express_mongo-backend:latest:latest %DOCKER_USER%/gestion-smartphones-backend:latest
-                            docker tag express_mongo-frontend:latest:latest %DOCKER_USER%/gestion-smartphones-frontend:latest
+                            docker tag express_mongo-backend:latest %DOCKER_USER%/gestion-smartphones-backend:latest
+                            docker tag express_mongo-frontend:latest %DOCKER_USER%/gestion-smartphones-frontend:latest
 
                             echo "Pushing images vers Docker Hub..."
                             docker push %DOCKER_USER%/gestion-smartphones-backend:latest
