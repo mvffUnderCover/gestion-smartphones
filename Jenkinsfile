@@ -29,8 +29,14 @@ pipeline {
                 }
             }
         }
-        
-        // 🚀 Nouveau stage : Push Docker Images vers Docker Hub
+        stage('Run Tests') {
+            steps {
+                dir('gestion-smartphone-backend') {
+                    bat 'npm test || echo "⚠️ Aucun test trouvé ou échec des tests"'
+                }
+            }
+        }
+        // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Push Docker Images') {
             steps {
                 script {

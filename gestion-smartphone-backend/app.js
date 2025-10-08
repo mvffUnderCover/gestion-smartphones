@@ -1,27 +1,15 @@
 const express = require('express');
-const cors = require('cors');   // 
-const dotenv = require('dotenv');
-const connectDB = require('./connectdb');
+const cors = require('cors');
 const smartphoneRoutes = require('./routes/smartphoneRoutes');
 
-dotenv.config();
-
-// Connexion à MongoDB
-connectDB();
-
-// Création de l’application Express
 const app = express();
 
-// Autoriser un body JSON plus gros (ex: 10mb)
-app.use(express.json({ limit: "10mb" }));
-
+// Middleware
 app.use(express.json());
-
-app.use(cors()); 
+app.use(cors());
 
 // Routes API
-app.use('/api', smartphoneRoutes);
+app.use('/api/smartphones', smartphoneRoutes);
 
-// Lancer le serveur
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));
+// ✅ Exporter uniquement l'app (pas de connectDB, pas de listen)
+module.exports = app;
