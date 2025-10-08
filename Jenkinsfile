@@ -59,12 +59,27 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Up') {
+        stage('Deploiement (compose.yaml)') {
             steps {
-                bat "docker-compose -f \"${DOCKER_COMPOSE_PATH}\" build"
-                bat "docker-compose -f \"${DOCKER_COMPOSE_PATH}\" up -d"
+                dir('.') {
+                    bat '''
+                        echo Arrêt des anciens conteneurs...
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" down || echo Aucun conteneur à arrêter.
+
+                        echo Reconstruction complète des images...
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" build --no-cache
+
+                        echo Démarrage des services...
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" up -d
+
+                        echo Vérification des conteneurs actifs...
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" ps
+
+                        echo Derniers logs :
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" logs --tail=30
+                    '''
+                }
             }
-        }
 
         stage('Send Notification') {
             steps {
