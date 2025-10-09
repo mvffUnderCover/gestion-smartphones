@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_COMPOSE_PATH = "C:\\Users\\bachir\\Documents\\repo-git\\express_mongo\\docker-compose.yml"
+        SONAR_AUTH_TOKEN = credentials('sonar-auth-token')
         NOTIFY_EMAIL = "cmakhtar497@gmail.com"
     }
 
@@ -37,6 +38,23 @@ pipeline {
             }
         }
         // Nouveau stage : Push Docker Images vers Docker Hub
+        stage('Analyse SonarQube') {
+            steps {
+                withSonarQubeEnv('SonarQubeLocal') { // le nom que tu as mis dans la config Jenkins
+                    bat """
+                        sonar-scanner ^
+                            -Dsonar.projectKey=gestion-smartphones ^
+                            -Dsonar.projectName="Gestion Smartphones" ^
+                            -Dsonar.sources=gestion-smartphone-backend ^
+                            -Dsonar.host.url=http://localhost:9000 ^
+                            -Dsonar.login=${SONAR_AUTH_TOKEN} ^
+                            -Dsonar.language=js ^
+                            -Dsonar.sourceEncoding=UTF-8
+                    """
+                }
+            }
+        }
+
         stage('Push Docker Images') {
             steps {
                 script {
