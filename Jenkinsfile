@@ -38,11 +38,14 @@ pipeline {
             }
         }
         stage('Vérifier SonarQube Scanner') {
-            tools { 'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner_Windows' }
-            steps {
-                bat 'sonar-scanner --version'
+        steps {
+            script {
+                def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                bat "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" --version"
             }
         }
+    }
+
 
         // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
@@ -54,7 +57,7 @@ pipeline {
                         withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
                             bat '''
                                 echo Lancement de l'analyse SonarQube...
-                                sonar-scanner ^
+                                "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" ^
                                     -Dsonar.projectKey=Gestion-de-smartphone ^
                                     -Dsonar.sources=. ^
                                     -Dsonar.host.url=http://localhost:9000 ^
