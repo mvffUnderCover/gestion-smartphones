@@ -43,44 +43,28 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat '''
                             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                            
-                            echo "Tagging images avant push..."
-                            docker tag express_mongo-backend:latest %DOCKER_USER%/gestion-smartphones-backend:latest
-                            docker tag express_mongo-frontend:latest %DOCKER_USER%/gestion-smartphones-frontend:latest
-
-                            echo "Pushing images vers Docker Hub..."
                             docker push %DOCKER_USER%/gestion-smartphones-backend:latest
                             docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
-
-                            echo "Push terminé avec succès !"
                         '''
                     }
                 }
             }
         }
 
-        stage('Deploiement (compose.yaml)') {
+      stage('Déploiement (compose.yaml)') {
             steps {
                 dir('.') {
                     bat '''
-                        echo Arrêt des anciens conteneurs...
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" down || echo Aucun conteneur à arrêter.
+                        echo 🚀 Déploiement des conteneurs Docker...
+                        docker-compose -f "%DOCKER_COMPOSE_PATH%" up -d --build
 
-                        echo Reconstruction complète des images...
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" build --no-cache
-
-                        echo Démarrage des services...
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" up -d
-
-                        echo Vérification des conteneurs actifs...
+                        echo ✅ Vérification des conteneurs :
                         docker-compose -f "%DOCKER_COMPOSE_PATH%" ps
-
-                        echo Derniers logs :
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" logs --tail=30
                     '''
                 }
             }
         }
+        
         stage('Send Notification') {
             steps {
                 script {
