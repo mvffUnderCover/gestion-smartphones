@@ -49,24 +49,25 @@ pipeline {
 
         // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
-                tools { 
-                    'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner_Windows' 
-                }
                 steps {
-                    withSonarQubeEnv('SonarQube') { // Nom du serveur défini dans "Manage Jenkins" → "Configure System"
-                        withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                            bat '''
-                                echo Lancement de l'analyse SonarQube...
-                                "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" ^
+                    script {
+                        def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        withSonarQubeEnv('SonarQube') {
+                            withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                                bat """
+                                    echo Lancement de l'analyse SonarQube...
+                                    "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
                                     -Dsonar.projectKey=Gestion-de-smartphone ^
                                     -Dsonar.sources=. ^
                                     -Dsonar.host.url=http://localhost:9000 ^
                                     -Dsonar.login=%SONAR_AUTH_TOKEN%
-                            '''
+                                """
+                            }
                         }
                     }
                 }
             }
+
 
 
         stage('Push Docker Images') {
