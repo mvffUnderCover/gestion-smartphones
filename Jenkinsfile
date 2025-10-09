@@ -37,7 +37,7 @@ pipeline {
                 }
             }
         }
-        stage('Vérifier SonarQube Scanner') {
+        stage('Verification SonarQube Scanner') {
         steps {
             script {
                 def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
@@ -84,7 +84,7 @@ pipeline {
             }
         }
 
-      stage('Déploiement (compose.yaml)') {
+      stage('Deploiement (compose.yaml)') {
             steps {
                 dir('.') {
                     bat '''
