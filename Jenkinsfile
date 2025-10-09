@@ -37,23 +37,31 @@ pipeline {
                 }
             }
         }
-        // Nouveau stage : Push Docker Images vers Docker Hub
-        stage('Analyse SonarQube') {
+        stage('Vérifier SonarQube Scanner') {
+            tools { sonarQubeScanner 'SonarScanner_Windows' }
             steps {
-                withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                    bat '''
-                        echo Lancement de l\'analyse SonarQube...
-                        "C:\\sonar-scanner\\bin\\sonar-scanner.bat" ^
-                        -Dsonar.projectKey=Gestion-de-smartphone ^
-                        -Dsonar.sources=. ^
-                        -Dsonar.host.url=http://localhost:9000 ^
-                        -Dsonar.login=%SONAR_AUTH_TOKEN%
-                    '''
-                }
+                bat 'sonar-scanner --version'
             }
         }
 
-
+        // Nouveau stage : Push Docker Images vers Docker Hub
+        stage('Analyse SonarQube') {
+            tools { sonarQubeScanner 'SonarScanner_Windows' }  // nom défini dans "Manage Jenkins"
+            steps {
+                withSonarQubeEnv('SonarQube') { // Nom défini dans "Manage Jenkins" → "Configure System" → "SonarQube Servers"
+                    withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                        bat '''
+                            echo Lancement de l'analyse SonarQube...
+                            sonar-scanner ^
+                                -Dsonar.projectKey=Gestion-de-smartphone ^
+                                -Dsonar.sources=. ^
+                                -Dsonar.host.url=http://localhost:9000 ^
+                                -Dsonar.login=%SONAR_AUTH_TOKEN%
+                        '''
+                    }
+                }
+            }
+        }
 
         stage('Push Docker Images') {
             steps {
