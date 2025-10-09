@@ -13,7 +13,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/mvffUnderCover/gestion-smartphones.git'
             }
         }
-
+   }
         stage('Install Backend') {
             steps {
                 dir('gestion-smartphone-backend') {
@@ -38,13 +38,13 @@ pipeline {
             }
         }
         stage('Verification SonarQube Scanner') {
-        steps {
-            script {
-                def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                bat "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" --version"
+            steps {
+                script {
+                    def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    bat "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" --version"
+                }
             }
         }
-    }
 
 
         // Nouveau stage : Push Docker Images vers Docker Hub
@@ -88,10 +88,10 @@ pipeline {
             steps {
                 dir('.') {
                     bat '''
-                        echo 🚀 Déploiement des conteneurs Docker...
+                        echo Déploiement des conteneurs Docker...
                         docker-compose -f "%DOCKER_COMPOSE_PATH%" up -d --build
 
-                        echo ✅ Vérification des conteneurs :
+                        echo Vérification des conteneurs :
                         docker-compose -f "%DOCKER_COMPOSE_PATH%" ps
                     '''
                 }
@@ -118,7 +118,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
     post {
         always {
