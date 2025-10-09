@@ -47,8 +47,6 @@ pipeline {
         // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
                 tools { 
-                    // le nom doit correspondre à celui que tu as défini dans
-                    // Manage Jenkins → Tools → SonarQube Scanner
                     'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner_Windows' 
                 }
                 steps {
