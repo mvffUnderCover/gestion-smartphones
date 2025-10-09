@@ -52,7 +52,7 @@ pipeline {
                 steps {
                     script {
                         def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        withSonarQubeEnv('SonarQube') {
+                        withSonarQubeEnv('SonarQubeLocal') {
                             withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
                                 bat """
                                     echo Lancement de l'analyse SonarQube...
