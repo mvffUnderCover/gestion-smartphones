@@ -8,12 +8,13 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/mvffUnderCover/gestion-smartphones.git'
             }
         }
-   }
+
         stage('Install Backend') {
             steps {
                 dir('gestion-smartphone-backend') {
@@ -30,6 +31,7 @@ pipeline {
                 }
             }
         }
+
         stage('Run Tests') {
             steps {
                 dir('gestion-smartphone-backend') {
@@ -37,6 +39,7 @@ pipeline {
                 }
             }
         }
+
         stage('Verification SonarQube Scanner') {
             steps {
                 script {
@@ -46,29 +49,25 @@ pipeline {
             }
         }
 
-
-        // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
-                steps {
-                    script {
-                        def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        withSonarQubeEnv('SonarQubeLocal') {
-                            withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                                bat """
-                                    echo Lancement de l'analyse SonarQube...
-                                    "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
-                                    -Dsonar.projectKey=Gestion-de-smartphone ^
-                                    -Dsonar.sources=. ^
-                                    -Dsonar.host.url=http://localhost:9000 ^
-                                    -Dsonar.login=%SONAR_AUTH_TOKEN%
-                                """
-                            }
+            steps {
+                script {
+                    def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withSonarQubeEnv('SonarQubeLocal') {
+                        withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                            bat """
+                                echo Lancement de l'analyse SonarQube...
+                                "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
+                                -Dsonar.projectKey=Gestion-de-smartphone ^
+                                -Dsonar.sources=. ^
+                                -Dsonar.host.url=http://localhost:9000 ^
+                                -Dsonar.login=%SONAR_AUTH_TOKEN%
+                            """
                         }
                     }
                 }
             }
-
-
+        }
 
         stage('Push Docker Images') {
             steps {
@@ -84,7 +83,7 @@ pipeline {
             }
         }
 
-      stage('Deploiement (compose.yaml)') {
+        stage('Deploiement (compose.yaml)') {
             steps {
                 dir('.') {
                     bat '''
@@ -97,12 +96,12 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Send Notification') {
             steps {
                 script {
                     def result = currentBuild.currentResult
-                    def statusIcon = result == 'SUCCESS' ? 'Impeccable' : 'Probléme'
+                    def statusIcon = result == 'SUCCESS' ? 'Impeccable' : 'Problème'
                     def subject = "${statusIcon} Build ${result} : ${env.JOB_NAME} #${env.BUILD_NUMBER}"
                     def body = """Bonjour Bachir,
 
@@ -118,7 +117,7 @@ pipeline {
                 }
             }
         }
-    
+    }
 
     post {
         always {
