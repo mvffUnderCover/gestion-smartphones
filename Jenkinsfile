@@ -46,22 +46,27 @@ pipeline {
 
         // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
-            tools { sonarQubeScanner 'SonarScanner_Windows' }  // nom défini dans "Manage Jenkins"
-            steps {
-                withSonarQubeEnv('SonarQube') { // Nom défini dans "Manage Jenkins" → "Configure System" → "SonarQube Servers"
-                    withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                        bat '''
-                            echo Lancement de l'analyse SonarQube...
-                            sonar-scanner ^
-                                -Dsonar.projectKey=Gestion-de-smartphone ^
-                                -Dsonar.sources=. ^
-                                -Dsonar.host.url=http://localhost:9000 ^
-                                -Dsonar.login=%SONAR_AUTH_TOKEN%
-                        '''
+                tools { 
+                    // le nom doit correspondre à celui que tu as défini dans
+                    // Manage Jenkins → Tools → SonarQube Scanner
+                    'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner_Windows' 
+                }
+                steps {
+                    withSonarQubeEnv('SonarQube') { // Nom du serveur défini dans "Manage Jenkins" → "Configure System"
+                        withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                            bat '''
+                                echo Lancement de l'analyse SonarQube...
+                                sonar-scanner ^
+                                    -Dsonar.projectKey=Gestion-de-smartphone ^
+                                    -Dsonar.sources=. ^
+                                    -Dsonar.host.url=http://localhost:9000 ^
+                                    -Dsonar.login=%SONAR_AUTH_TOKEN%
+                            '''
+                        }
                     }
                 }
             }
-        }
+
 
         stage('Push Docker Images') {
             steps {
