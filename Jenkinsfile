@@ -40,7 +40,7 @@ pipeline {
         // Nouveau stage : Push Docker Images vers Docker Hub
         stage('Analyse SonarQube') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
                     bat '''
                         echo Lancement de l\'analyse SonarQube...
                         "C:\\sonar-scanner\\bin\\sonar-scanner.bat" ^
