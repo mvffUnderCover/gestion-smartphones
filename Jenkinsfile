@@ -38,7 +38,7 @@ pipeline {
             }
         }
         stage('Vérifier SonarQube Scanner') {
-            tools { sonarQubeScanner 'SonarScanner_Windows' }
+            tools { 'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner_Windows' }
             steps {
                 bat 'sonar-scanner --version'
             }
