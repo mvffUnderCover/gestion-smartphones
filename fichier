@@ -3,4 +3,4 @@ enkins va te détecter !
 Vérifions a nouveau le build
 Un autre build
 Ok Docker démarré
-Test du pipeline
+Test du pipeline aprés l'ajoute du stage "Analyse Sonarqube"
