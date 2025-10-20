@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_COMPOSE_PATH = "C:\\Users\\bachir\\Documents\\repo-git\\express_mongo\\docker-compose.yml"
         SONAR_AUTH_TOKEN = credentials('sonar-auth-token')
         NOTIFY_EMAIL = "cmakhtar497@gmail.com"
+        DOCKER_USER = credentials('docker-hub-identifiants')
     }
 
     stages {
@@ -40,60 +40,50 @@ pipeline {
             }
         }
 
-        stage('Verification SonarQube Scanner') {
-            steps {
-                script {
-                    def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    bat "\"${sonarScannerHome}\\bin\\sonar-scanner.bat\" --version"
-                }
-            }
-        }
-
         stage('Analyse SonarQube') {
             steps {
                 script {
                     def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQubeLocal') {
-                        withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                            bat """
-                                echo Lancement de l'analyse SonarQube...
-                                "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
-                                -Dsonar.projectKey=Gestion-de-smartphone ^
-                                -Dsonar.sources=. ^
-                                -Dsonar.host.url=http://localhost:9000 ^
-                                -Dsonar.login=%SONAR_AUTH_TOKEN%
-                            """
-                        }
+                        bat """
+                            "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
+                            -Dsonar.projectKey=Gestion-de-smartphone ^
+                            -Dsonar.sources=. ^
+                            -Dsonar.host.url=http://localhost:9000 ^
+                            -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        """
                     }
                 }
             }
         }
 
-        stage('Push Docker Images') {
+        stage('Build & Push Docker Images') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        bat '''
+                        bat """
                             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                            docker build -t %DOCKER_USER%/gestion-smartphones-backend:latest ./gestion-smartphone-backend
+                            docker build -t %DOCKER_USER%/gestion-smartphones-frontend:latest ./gestion-smartphone-frontend
                             docker push %DOCKER_USER%/gestion-smartphones-backend:latest
                             docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
-                        '''
+                        """
                     }
                 }
             }
         }
 
-        stage('Deploiement (compose.yaml)') {
+        stage('Deploiement Kubernetes') {
             steps {
-                dir('.') {
-                    bat '''
-                        echo Déploiement des conteneurs Docker...
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" up -d --build
-
-                        echo Vérification des conteneurs :
-                        docker-compose -f "%DOCKER_COMPOSE_PATH%" ps
-                    '''
-                }
+                bat '''
+                    echo ===== Démarrage du déploiement Kubernetes =====
+                    kubectl apply -f k8s/
+                    kubectl rollout restart deployment smartphone-backend
+                    kubectl rollout restart deployment smartphone-frontend
+                    echo ===== Déploiement terminé =====
+                    kubectl get pods
+                    kubectl get svc
+                '''
             }
         }
 
@@ -101,18 +91,16 @@ pipeline {
             steps {
                 script {
                     def result = currentBuild.currentResult
-                    def statusIcon = result == 'SUCCESS' ? 'Impeccable' : 'Problème'
+                    def statusIcon = result == 'SUCCESS' ? '✅ Succès' : '❌ Échec'
                     def subject = "${statusIcon} Build ${result} : ${env.JOB_NAME} #${env.BUILD_NUMBER}"
                     def body = """Bonjour Bachir,
 
-                    Le build du job **${env.JOB_NAME} #${env.BUILD_NUMBER}** s’est terminé avec le statut : ${result}.
+Le build du job **${env.JOB_NAME} #${env.BUILD_NUMBER}** s’est terminé avec le statut : ${result}.
 
-                    Détails du build : ${env.BUILD_URL}
+Détails du build : ${env.BUILD_URL}
 
-                    -- Jenkins
-                    """
-
-                    echo "Envoi d’un e-mail (${result})..."
+-- Jenkins CI/CD
+"""
                     mail to: "${NOTIFY_EMAIL}", subject: subject, body: body
                 }
             }
