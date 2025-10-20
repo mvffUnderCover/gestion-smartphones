@@ -60,29 +60,42 @@ pipeline {
             }
         }
 
-        stage('Build & Push Docker Images') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        bat """
-                            echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                            
-                            echo Construction du backend...
-                            docker pull %DOCKER_USER%/gestion-smartphones-backend:latest || echo "Pas d'image existante"
-                            docker build --pull --cache-from %DOCKER_USER%/gestion-smartphones-backend:latest -t %DOCKER_USER%/gestion-smartphones-backend:latest ./gestion-smartphone-backend
+                    bat """
+                        echo === Construction des images Docker ===
 
-                            echo Construction du frontend...
-                            docker pull %DOCKER_USER%/gestion-smartphones-frontend:latest || echo "Pas d'image existante"
-                            docker build --pull --cache-from %DOCKER_USER%/gestion-smartphones-frontend:latest -t %DOCKER_USER%/gestion-smartphones-frontend:latest ./gestion-smartphone-frontend
+                        docker build -t gestion-smartphones-backend:latest ./gestion-smartphone-backend
+                        docker build -t gestion-smartphones-frontend:latest ./gestion-smartphone-frontend
 
-                            echo Envoi sur Docker Hub...
-                            docker push %DOCKER_USER%/gestion-smartphones-backend:latest
-                            docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
-                        """
-                    }
+                        echo === Liste des images locales ===
+                        docker images
+                    """
                 }
             }
         }
+
+            stage('Push Docker Images') {
+                steps {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                            bat """
+                                echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+
+                                echo === Tag des images avec votre namespace Docker Hub ===
+                                docker tag gestion-smartphones-backend:latest %DOCKER_USER%/gestion-smartphones-backend:latest
+                                docker tag gestion-smartphones-frontend:latest %DOCKER_USER%/gestion-smartphones-frontend:latest
+
+                                echo === Push des images sur Docker Hub ===
+                                docker push %DOCKER_USER%/gestion-smartphones-backend:latest
+                                docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
+                            """
+                        }
+                    }
+                }
+            }
+
 
 
         stage('Deploiement Kubernetes') {
