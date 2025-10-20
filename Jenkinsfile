@@ -66,8 +66,16 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-identifiants', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         bat """
                             echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                            docker build -t %DOCKER_USER%/gestion-smartphones-backend:latest ./gestion-smartphone-backend
-                            docker build -t %DOCKER_USER%/gestion-smartphones-frontend:latest ./gestion-smartphone-frontend
+                            
+                            echo Construction du backend...
+                            docker pull %DOCKER_USER%/gestion-smartphones-backend:latest || echo "Pas d'image existante"
+                            docker build --pull --cache-from %DOCKER_USER%/gestion-smartphones-backend:latest -t %DOCKER_USER%/gestion-smartphones-backend:latest ./gestion-smartphone-backend
+
+                            echo Construction du frontend...
+                            docker pull %DOCKER_USER%/gestion-smartphones-frontend:latest || echo "Pas d'image existante"
+                            docker build --pull --cache-from %DOCKER_USER%/gestion-smartphones-frontend:latest -t %DOCKER_USER%/gestion-smartphones-frontend:latest ./gestion-smartphone-frontend
+
+                            echo Envoi sur Docker Hub...
                             docker push %DOCKER_USER%/gestion-smartphones-backend:latest
                             docker push %DOCKER_USER%/gestion-smartphones-frontend:latest
                         """
@@ -75,6 +83,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Deploiement Kubernetes') {
             steps {
