@@ -45,13 +45,16 @@ pipeline {
                 script {
                     def sonarScannerHome = tool name: 'SonarScanner_Windows', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQubeLocal') {
-                        bat """
-                            "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
-                            -Dsonar.projectKey=Gestion-de-smartphone ^
-                            -Dsonar.sources=. ^
-                            -Dsonar.host.url=http://localhost:9000 ^
-                            -Dsonar.login=${SONAR_AUTH_TOKEN}
-                        """
+                        withCredentials([string(credentialsId: 'sonar-auth-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                            bat """
+                                echo Lancement de l'analyse SonarQube...
+                                "${sonarScannerHome}\\bin\\sonar-scanner.bat" ^
+                                -Dsonar.projectKey=Gestion-de-smartphone ^
+                                -Dsonar.sources=. ^
+                                -Dsonar.host.url=http://localhost:9000 ^
+                                -Dsonar.login=%SONAR_AUTH_TOKEN%
+                            """
+                        }
                     }
                 }
             }
