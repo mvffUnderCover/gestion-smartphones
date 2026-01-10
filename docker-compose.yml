@@ -2,7 +2,7 @@ services:
   mongo:
     image: mongo:6
     container_name: mongo
-    restart: always
+    restart: no
     ports:
       - "27017:27017"
     volumes:
@@ -11,7 +11,7 @@ services:
   backend:
     build: ./gestion-smartphone-backend
     container_name: backend
-    restart: always
+    restart: no
     ports:
       - "5000:5000"
     env_file:
@@ -22,7 +22,7 @@ services:
   frontend:
     build: ./gestion-smartphone-frontend
     container_name: frontend
-    restart: always
+    restart: no
     ports:
       - "3000:80"
     depends_on:
