@@ -30,7 +30,8 @@ Automatiser entièrement le build, le déploiement et la livraison
 
 Simuler un environnement proche de la production
 
-Architecture Globale
+## Architecture Globale
+
 Client (React + Tailwind)
         |
         v
@@ -110,11 +111,13 @@ Il comprend notamment :
 
 - Un pipeline complet a été mis en place :
 
-- Push de code sur GitHub
+- Push de code sur GitHub 
 
 - Déclenchement automatique via Webhooks
 
 - Notification de Jenkins en local à l’aide de Grok
+
+- Scan de code avec SonarQube pour évaluer la qualité du code
 
 - Build automatique des images Docker
 
