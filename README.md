@@ -8,27 +8,27 @@ Ce projet fil rouge a été réalisé dans le cadre de la formation intensive à
 
 L’application est une plateforme complète de gestion de smartphones, pensée non pas comme un simple CRUD, mais comme un système backend structurant, intégrant :
 
-une architecture modulaire
+ - une architecture modulaire
 
-des pipelines CI/CD automatisés
+ - des pipelines CI/CD automatisés
 
-une conteneurisation complète
+ - une conteneurisation complète
 
-une orchestration Kubernetes
+ - une orchestration Kubernetes
 
 Ce projet reflète ma capacité à concevoir, industrialiser et opérer une application backend moderne en production.
 
 ## Objectifs Techniques du Projet
 
-Concevoir une API backend solide avec des règles métier non triviales
+ - Concevoir une API backend solide avec des règles métier non triviales
 
-Mettre en place une architecture scalable et maintenable
+ - Mettre en place une architecture scalable et maintenable
 
-Appliquer les bonnes pratiques DevOps (CI/CD, Docker, Kubernetes)
+ - Appliquer les bonnes pratiques DevOps (CI/CD, Docker, Kubernetes)
 
-Automatiser entièrement le build, le déploiement et la livraison
+ - Automatiser entièrement le build, le déploiement et la livraison
 
-Simuler un environnement proche de la production
+ - Simuler un environnement proche de la production
 
 ## Architecture Globale
 
